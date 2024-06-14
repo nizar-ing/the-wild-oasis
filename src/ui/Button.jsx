@@ -55,11 +55,11 @@ const Button = styled.button`
   box-shadow: var(--shadow-sm);
   
   ${props => sizes[props.size]};
-  ${props => variations[props.variantion]};
+  ${props => variations[props.variation]};
 `;
 
-ButtonIcon.defaultProps = {
-  variantion: "primary",
+Button.defaultProps = {
+  variation: "primary",
   size: "medium",
 };
 

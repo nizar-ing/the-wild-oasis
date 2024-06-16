@@ -28,7 +28,7 @@ function CreateCabinForm() {
     const {errors} = formState;
 
     const onSubmit = (data) => {
-        mutate(data);
+        mutate({...data, image: data.image[0]});
     }
     const onError = (errors) => {
         //console.log(errors); we can not use the "onError" method since we have this from the useForm hook. Perhaps we can use it for centric stuffs
@@ -96,7 +96,12 @@ function CreateCabinForm() {
             </FormRow>
 
             <FormRow label="Cabin photo">
-                <FileInput id="image" accept="image/*" disabled={isCreating}/>
+                <FileInput
+                    id="image"
+                    accept="image/*"
+                    disabled={isCreating}
+                    {...register('image', {required: 'This field is required'})}
+                />
             </FormRow>
 
             <FormRow>

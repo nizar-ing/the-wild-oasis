@@ -1,50 +1,33 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {useForm} from "react-hook-form";
-import toast from "react-hot-toast";
 
+import {useCreateCabin} from "./useCreateCabin.js";
+import {useEditCabin} from "./useEditCabin.js";
 import {FormRow} from "../../ui/FormRow";
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
-import {createOrEditCabin} from "../../services/apiCabins.js";
 
 function CreateCabinForm({cabinToEdit = {}}) {
     const {id: editCabinId, ...editValues} = cabinToEdit;
     const {register, handleSubmit, reset, formState, getValues} = useForm({
         defaultValues: Boolean(editCabinId) ? editValues : {}
     });
-    const queryClient = useQueryClient();
-    const {mutate: createCabin, isLoading: isCreating} = useMutation({
-        mutationFn: createOrEditCabin, //  <==> (newCabin) => createCabin(newCabin)
-        onSuccess: async () => {
-            toast.success("New cabin successfully created");
-            await queryClient.invalidateQueries({
-                queryKey: ['cabins']
-            });
-            reset();
-        },
-        onError: error => toast.error(error.message)
-    });
-    const {mutate: editCabin, isLoading: isEditing} = useMutation({
-        mutationFn: ({editCabin, id}) => createOrEditCabin(editCabin, id),
-        onSuccess: async () => {
-            toast.success("Cabin successfully edited");
-            await queryClient.invalidateQueries({
-                queryKey: ['cabins']
-            });
-            reset();
-        },
-        onError: error => toast.error(error.message)
-    });
+    const {isCreating, createCabin} = useCreateCabin();
+    const {isEditing, editCabin} = useEditCabin(reset);
 
     const {errors} = formState;
     const isWorking = isCreating || isEditing;
     const onSubmit = (data) => {
         const image = typeof data.image === "string" ? data.image : data.image[0];
-        if(Boolean(editCabinId)) editCabin({editCabin: {...data, image}, id: editCabinId});
-        else createCabin({...data, image});
+        if(Boolean(editCabinId)) editCabin({editCabinObj: {...data, image}, id: editCabinId}, {
+            onSuccess: () => reset()
+        });
+        else createCabin({...data, image}, {
+            onSuccess: () => reset()
+        });
     }
     const onError = (errors) => {
         //console.log(errors); we can not use the "onError" method since we have this from the useForm hook. Perhaps we can use it for centric stuffs
@@ -106,7 +89,6 @@ function CreateCabinForm({cabinToEdit = {}}) {
                 <Textarea type="number"
                           id="description"
                           defaultValue=""
-                          disabled={isWorking}
                           {...register('description', {required: 'This field is required'})}
                 />
             </FormRow>

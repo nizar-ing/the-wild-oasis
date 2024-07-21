@@ -45,9 +45,10 @@ export function Filter({filterField, options}) {
     }
     return (
         <StyledFilter>
-            {options.map((option, index) => (
-                    <FilterButton key={index}
+            {options.map((option) => (
+                    <FilterButton key={option.value}
                                   active={currentFilter === option.value}
+                                  disabled={currentFilter === option.value}
                                   onClick={() => handleClick(option.value)}
                     >
                         {option.label}

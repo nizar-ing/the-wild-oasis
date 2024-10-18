@@ -1,4 +1,5 @@
-import Filter from 'ui/Filter';
+import {Filter} from "../../ui/Filter.jsx";
+
 
 function DashboardFilter() {
   return (
